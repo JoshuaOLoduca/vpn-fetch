@@ -9,12 +9,12 @@
     "got": "^12.5.0"
   },
   "name": "vpn-fetch",
-  "type":"module",
+  "type": "module",
   "version": "1.0.0",
   "description": "Start multiple vpn servers and make network requests through them",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc"
   },
   "repository": {
     "type": "git",
