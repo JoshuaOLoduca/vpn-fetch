@@ -36,4 +36,5 @@ const vpnFetch = new VPNFetch(
 await vpnFetch.connect();
 const response = await vpnFetch.get("https://ifconfig.me/ip");
 console.log("IP:", response.body);
+vpnFetch.disconnect();
 ```
