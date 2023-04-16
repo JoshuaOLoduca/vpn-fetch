@@ -9,10 +9,13 @@ export class VPNFetch {
   ovpnProcess?: ChildProcess;
   pkillFind?: string;
 
-  constructor(private configFile: string, private loginFile: string) {}
-
+  constructor(
+    private configFile: string,
+    private loginFile: string,
+    private verbose = false
+  ) {}
   async getNewTableId(): Promise<string> {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       const command = `ip route show table all | \\
       grep "table" | \\
       sed 's/.*\\(table.*\\)/\\1/g' | \\
@@ -22,10 +25,14 @@ export class VPNFetch {
       grep -e "[0-9]"`;
       exec(command, (err, stdout) => {
         if (err) {
-          console.log("err", err);
+          if (this.verbose) {
+            console.log("err", err);
+          }
           resolve("10");
         }
-        console.log("stdout", stdout);
+        if (this.verbose) {
+          console.log("stdout", stdout);
+        }
         const existingIds = stdout
           .toString()
           .trim()
@@ -70,11 +77,16 @@ export class VPNFetch {
           .toString()
           .split("\n")
           .forEach((line: string) => {
-            const data = line.trim();
-            console.log("data", data);
+            const data = line.toString().trim();
+            if (this.verbose) {
+              console.log(data);
+            }
             if (data.toString().includes("[[network interface]]")) {
               this.interface = data.toString().split(":")[1]?.trim();
-              console.log("data.toString()", data.toString());
+
+              if (this.verbose) {
+                console.log("Echo from route_up.sh:", data.toString());
+              }
               console.log(
                 chalk.green(
                   `Sucessfully created VPN interface on ${this.interface}`
@@ -85,7 +97,12 @@ export class VPNFetch {
               reject(new Error(`Auth failed for ${this.configFile}`));
             }
             if (data.toString().includes("Initialization Sequence Completed")) {
-              console.log(chalk.green(data.toString().trim()));
+              if (this.verbose) {
+                console.log(
+                  "Openvpn completed:",
+                  chalk.green(data.toString().trim())
+                );
+              }
               this.ovpnProcess = ovpnClient;
               resolve(this);
             }
