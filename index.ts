@@ -1,8 +1,10 @@
 import { spawn, exec, ChildProcess } from "node:child_process";
-import got, { OptionsInit } from "got";
+// import got, { OptionsInit } from "got";
+import axios, { AxiosRequestConfig } from "axios";
 import path from "path";
 import { fileURLToPath } from "url";
 import chalk from "chalk";
+
 export class VPNFetch {
   tableId?: string;
   interface?: string;
@@ -130,15 +132,15 @@ export class VPNFetch {
     return true;
   }
 
-  async get(url: string, opts?: OptionsInit): Promise<any> {
-    if (!opts) {
-      opts = {
-        localAddress: this.interface,
-      };
-    } else {
-      opts.localAddress = this.interface;
-    }
+  async get(url: string, opts?: AxiosRequestConfig): Promise<any> {
+    if (!opts) opts = {};
+    opts.proxy = {
+      protocol: "https",
+      host: this.interface as string,
+      port: Number(this.tableId),
+    };
+
     console.log("opts", opts);
-    return await got.get(url, opts);
+    return await axios.get(url);
   }
 }
